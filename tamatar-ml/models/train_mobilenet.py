@@ -3,6 +3,8 @@ import torchvision
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader
+import os
+import json
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -45,12 +47,17 @@ for epoch in range(epochs):
         outputs = model(images)
         loss = criterion(outputs, labels)
 
-        loss.backward()
+        loss.backward() 
         optimizer.step()
 
         running_loss += loss.item()
 
     print(f"Epoch {epoch+1}/{epochs}, Loss: {running_loss/len(loader):.4f}")
 
-torch.save(model.state_dict(), "mobilenet.pth")
-print("Model saved!")
+os.makedirs("checkpoints", exist_ok =True)
+torch.save(model.state_dict(),"checkpoints/mobilenet.pth")
+
+with open("checkpoints/classes.json","w") as f:
+    json.dump(dataset.classes, f)
+
+print("Model and classes saved in checkpoints!")
